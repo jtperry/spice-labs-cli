@@ -130,7 +130,7 @@ if ($command -eq "upload-deployment-events") { $flags += "-i" }
 
 Write-Host "🚀 Running spice-labs-cli with command: $command" 
 Write-Host "📁 Mounting input:  $inputPath" 
-if ($outputPath) { Write-Host "📁 Mounting output: ($outputPath)" }
+if ($outputPath) { Write-Host "Mounting output: ($outputPath)" }
 
 # Run and filter output
 try {
