@@ -1,0 +1,171 @@
+#!/usr/bin/env pwsh
+#Requires -Version 5.1
+
+$ErrorActionPreference = "Stop"
+
+$DOCKER_IMAGE = "circlejtp/spice-labs-cli:latest"
+$ci_mode = $false
+$pull_latest = $true
+
+# Defaults
+$command = "run"
+$input = ""
+$output = ""
+$extra_args = @()
+
+function Show-Help {
+@"
+Usage: spice-labs-cli.ps1 --command <cmd> [--input <path>] [--output <path>] [--ci] [--quiet|--verbose]
+
+Commands:
+  run                     Scan artifacts and upload ADGs (default)
+  scan-artifacts          Generate ADGs only
+  upload-adgs             Upload existing ADGs
+  upload-deployment-events Upload deployment events from stdin
+
+Options:
+  --command CMD           One of: run, scan-artifacts, upload-adgs, upload-deployment-events
+  --input PATH            Path to input directory or file
+  --output PATH           Path for output (only needed for scan-artifacts)
+  --ci                    Run in CI/CD mode (non-interactive, implies --quiet unless overridden)
+  --quiet                 Suppress output
+  --verbose               Enable detailed logging
+  --no-pull               Don't pull the latest Docker image
+  --help                  Show this help
+"@
+}
+
+# Argument parsing
+$i = 0
+while ($i -lt $args.Count) {
+    switch ($args[$i]) {
+        '--command' {
+            $command = $args[$i + 1]
+            $i += 2
+            continue
+        }
+        '--input' {
+            $input = $args[$i + 1]
+            $i += 2
+            continue
+        }
+        '--output' {
+            $output = $args[$i + 1]
+            $i += 2
+            continue
+        }
+        '--ci' {
+            $ci_mode = $true
+            $i++
+            continue
+        }
+        '--no-pull' {
+            $pull_latest = $false
+            $i++
+            continue
+        }
+        '--quiet' { $extra_args += '--quiet'; $i++; continue }
+        '--verbose' { $extra_args += '--verbose'; $i++; continue }
+        '--help' {
+            Show-Help
+            exit 0
+        }
+        default {
+            $extra_args += $args[$i]
+            $i++
+        }
+    }
+}
+
+# Validate SPICE_PASS for commands that require it
+switch ($command) {
+    'scan-artifacts' { } # skip check
+    default {
+        if (-not $env:SPICE_PASS) {
+            Write-Host "❌ SPICE_PASS environment variable must be set for command '$command'" -ForegroundColor Red
+            exit 1
+        }
+    }
+}
+
+# Pull image unless skipped
+if ($pull_latest) {
+    docker pull $DOCKER_IMAGE | Out-Null
+}
+
+# Prepare args
+$docker_args = @('--command', $command)
+
+# Default to current dir as input if not set
+if (-not $input) { $input = (Get-Location).Path }
+$docker_args += @('--input', '/mnt/input')
+
+# Ensure output directory exists for commands that write to it
+if ($command -eq "scan-artifacts" -or $command -eq "run") {
+    if (-not $output) {
+        $output = New-TemporaryFile | Split-Path
+    } else {
+        if (-not (Test-Path $output)) {
+            New-Item -ItemType Directory -Path $output | Out-Null
+        }
+    }
+    if (-not (Test-Path $output -PathType Container) -or -not (Get-Acl $output).AccessToString.Contains("Write")) {
+        Write-Host "❌ Output directory '$output' is not writable. Please fix permissions and try again." -ForegroundColor Red
+        exit 1
+    }
+    $docker_args += @('--output', '/mnt/output')
+}
+
+# Default to --quiet in CI unless overridden
+if ($ci_mode -and -not ($extra_args -contains '--verbose') -and -not ($extra_args -contains '--quiet')) {
+    $docker_args += '--quiet'
+}
+
+# Prepare Docker flags
+$volumes = @("-v", "$input:/mnt/input")
+if ($output) { $volumes += @("-v", "$output:/mnt/output") }
+
+$flags = @("-e", "SPICE_PASS", "--rm")
+if ($command -eq "upload-deployment-events") { $flags += "-i" }
+
+Write-Host "🚀 Running spice-labs-cli with command: $command" -ForegroundColor Cyan
+Write-Host "📁 Mounting input:  $input" -ForegroundColor Cyan
+if ($output) { Write-Host "📁 Mounting output: $output" -ForegroundColor Cyan }
+
+# Run and filter output
+try {
+    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $processInfo.FileName = "docker"
+    $processInfo.ArgumentList = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+    $processInfo.RedirectStandardOutput = $true
+    $processInfo.RedirectStandardError = $true
+    $processInfo.UseShellExecute = $false
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $processInfo
+    $process.Start() | Out-Null
+
+    # Filter output: replace 'spicelabs.sh' with 'spice-labs-cli.sh' and remove help block
+    $outputLines = @()
+    $helpBlock = $false
+    while (($line = $process.StandardOutput.ReadLine()) -ne $null) {
+        if ($line -match "::spice-labs-cli-help-start::") { $helpBlock = $true; continue }
+        if ($line -match "::spice-labs-cli-help-end::") { $helpBlock = $false; continue }
+        if ($helpBlock) { continue }
+        $outputLines += ($line -replace '\bspicelabs\.sh\b', 'spice-labs-cli.sh')
+    }
+    $outputLines | ForEach-Object { Write-Host $_ }
+
+    $stderr = $process.StandardError.ReadToEnd()
+    if ($stderr) { Write-Host $stderr -ForegroundColor Yellow }
+
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) {
+        throw "Spice Labs CLI failed."
+    }
+} catch {
+    Write-Host ""
+    Write-Host "❌ The Spice Labs CLI failed." -ForegroundColor Red
+    Show-Help
+    exit 1
+}
