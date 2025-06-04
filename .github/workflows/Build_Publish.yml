@@ -53,8 +53,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/spice-labs-inc/${{ github.event.repository.name }}
-            spicelabs/${{ github.event.repository.name }}
+            #ghcr.io/spice-labs-inc/${{ github.event.repository.name }}
+            circlejtp/${{ github.event.repository.name }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
