@@ -42,30 +42,30 @@ while ($i -lt $args.Count) {
         '--command' {
             $command = $args[$i + 1]
             $i += 2
-            continue
+            return
         }
         '--input' {
             $inputPath = $args[$i + 1]
             $i += 2
-            continue
+            return
         }
         '--output' {
             $outputPath = $args[$i + 1]
             $i += 2
-            continue
+            return
         }
         '--ci' {
             $ci_mode = $true
             $i++
-            continue
+            return
         }
         '--no-pull' {
             $pull_latest = $false
             $i++
-            continue
+            return
         }
-        '--quiet' { $extra_args += '--quiet'; $i++; continue }
-        '--verbose' { $extra_args += '--verbose'; $i++; continue }
+        '--quiet' { $extra_args += '--quiet'; $i++; return }
+        '--verbose' { $extra_args += '--verbose'; $i++; return }
         '--help' {
             Show-Help
             exit 0
