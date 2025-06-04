@@ -82,7 +82,7 @@ switch ($command) {
     'scan-artifacts' { } # skip check
     default {
         if (-not $env:SPICE_PASS) {
-            Write-Host "❌ SPICE_PASS environment variable must be set for command '$command'" -ForegroundColor Red
+            Write-Host "SPICE_PASS environment variable must be set for command '$command'" -ForegroundColor Red
             exit 1
         }
     }
