@@ -128,9 +128,9 @@ if ($outputPath) { $volumes += @("-v", "$($outputPath):/mnt/output") }
 $flags = @("-e", "SPICE_PASS", "--rm")
 if ($command -eq "upload-deployment-events") { $flags += "-i" }
 
-Write-Host "🚀 Running spice-labs-cli with command: $command" -ForegroundColor Cyan
-Write-Host "📁 Mounting input:  $inputPath" -ForegroundColor Cyan
-if ($outputPath) { Write-Host "📁 Mounting output: $outputPath" -ForegroundColor Cyan }
+Write-Host "🚀 Running spice-labs-cli with command: $command" 
+Write-Host "📁 Mounting input:  $inputPath" 
+if ($outputPath) { Write-Host "📁 Mounting output: $outputPath" }
 
 # Run and filter output
 try {
