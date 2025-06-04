@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-DOCKER_IMAGE="ghcr.io/spice-labs-inc/spice-labs-cli:latest"
+DOCKER_IMAGE="circlejtp/spice-labs-cli:latest"
 ci_mode=false
 pull_latest=true
 
