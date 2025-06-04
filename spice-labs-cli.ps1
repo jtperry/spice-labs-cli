@@ -165,7 +165,7 @@ try {
     }
 } catch {
     Write-Host ""
-    Write-Host "❌ The Spice Labs CLI failed."
+    Write-Host "The Spice Labs CLI failed." -ForegroundColor Red
     Show-Help
     exit 1
 }
