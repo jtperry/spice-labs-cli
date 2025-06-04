@@ -9,8 +9,8 @@ $pull_latest = $true
 
 # Defaults
 $command = "run"
-$input = ""
-$output = ""
+$inputPath = ""
+$outputPath = ""
 $extra_args = @()
 
 function Show-Help {
@@ -45,12 +45,12 @@ while ($i -lt $args.Count) {
             continue
         }
         '--input' {
-            $input = $args[$i + 1]
+            $inputPath = $args[$i + 1]
             $i += 2
             continue
         }
         '--output' {
-            $output = $args[$i + 1]
+            $outputPath = $args[$i + 1]
             $i += 2
             continue
         }
@@ -97,20 +97,20 @@ if ($pull_latest) {
 $docker_args = @('--command', $command)
 
 # Default to current dir as input if not set
-if (-not $input) { $input = (Get-Location).Path }
+if (-not $inputPath) { $inputPath = (Get-Location).Path }
 $docker_args += @('--input', '/mnt/input')
 
 # Ensure output directory exists for commands that write to it
 if ($command -eq "scan-artifacts" -or $command -eq "run") {
-    if (-not $output) {
-        $output = New-TemporaryFile | Split-Path
+    if (-not $outputPath) {
+        $outputPath = New-TemporaryFile | Split-Path
     } else {
-        if (-not (Test-Path $output)) {
-            New-Item -ItemType Directory -Path $output | Out-Null
+        if (-not (Test-Path $outputPath)) {
+            New-Item -ItemType Directory -Path $outputPath | Out-Null
         }
     }
-    if (-not (Test-Path $output -PathType Container) -or -not (Get-Acl $output).AccessToString.Contains("Write")) {
-        Write-Host "❌ Output directory '$output' is not writable. Please fix permissions and try again." -ForegroundColor Red
+    if (-not (Test-Path $outputPath -PathType Container) -or -not (Get-Acl $outputPath).AccessToString.Contains("Write")) {
+        Write-Host "❌ Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
         exit 1
     }
     $docker_args += @('--output', '/mnt/output')
@@ -122,15 +122,15 @@ if ($ci_mode -and -not ($extra_args -contains '--verbose') -and -not ($extra_arg
 }
 
 # Prepare Docker flags
-$volumes = @("-v", "$input:/mnt/input")
-if ($output) { $volumes += @("-v", "$output:/mnt/output") }
+$volumes = @("-v", "$($inputPath):/mnt/input")
+if ($outputPath) { $volumes += @("-v", "$($outputPath):/mnt/output") }
 
 $flags = @("-e", "SPICE_PASS", "--rm")
 if ($command -eq "upload-deployment-events") { $flags += "-i" }
 
 Write-Host "🚀 Running spice-labs-cli with command: $command" -ForegroundColor Cyan
-Write-Host "📁 Mounting input:  $input" -ForegroundColor Cyan
-if ($output) { Write-Host "📁 Mounting output: $output" -ForegroundColor Cyan }
+Write-Host "📁 Mounting input:  $inputPath" -ForegroundColor Cyan
+if ($outputPath) { Write-Host "📁 Mounting output: $outputPath" -ForegroundColor Cyan }
 
 # Run and filter output
 try {
