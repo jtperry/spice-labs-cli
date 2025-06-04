@@ -164,8 +164,8 @@ try {
         throw "Spice Labs CLI failed."
     }
 } catch {
-    Write-Host ""
-    Write-Host "The Spice Labs CLI failed."
+    Write-Host "   "
+    Write-Host "The Spice Labs CLI failed" 
     Show-Help
     exit 1
 }
