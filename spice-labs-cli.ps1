@@ -165,7 +165,7 @@ try {
    # Start-Process -FilePath "docker" -ArgumentList $cmdline
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $true
+    $processInfo.UseShellExecute = $false
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
     $process.Start() | Out-Null
