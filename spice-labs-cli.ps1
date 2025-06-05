@@ -110,7 +110,7 @@ if ($command -eq "scan-artifacts" -or $command -eq "run") {
             New-Item -ItemType Directory -Path $outputPath | Out-Null
         }
     }
-   if (-not (Test-Path $outputPath -PathType Container) 
+   if (-not (Test-Path $outputPath -PathType Container)) 
    {
        $test_tmp_filename = "writetest-"+[guid]::NewGuid()
 	$test_filename = (Join-Path $test_folder $test_tmp_filename)
