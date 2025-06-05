@@ -157,9 +157,9 @@ if ($outputPath) { Write-Host "Mounting output: ($outputPath)" }
 # Run and filter output
 try {
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-      Write-Host ("About to do docker")
     $processInfo.FileName = "docker"
     $processInfo.ArgumentList = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+          Write-Host ("After arrgument list")
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
