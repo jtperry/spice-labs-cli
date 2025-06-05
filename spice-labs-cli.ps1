@@ -157,18 +157,18 @@ if ($outputPath) { Write-Host "Mounting output: ($outputPath)" }
 
 # Run and filter output
 try {
-    #$processInfo = New-Object System.Diagnostics.ProcessStartInfo
-    #$processInfo.FileName = "docker"
+    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $processInfo.FileName = "docker"
     Write-Host (@("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args)
-    $cmdline = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
-    #$processInfo.ArgumentList = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
-    Start-Process -FilePath "docker" -ArgumentList $cmdline
-    #$processInfo.RedirectStandardOutput = $true
-    #$processInfo.RedirectStandardError = $true
-    #$processInfo.UseShellExecute = $true
-    #$process = New-Object System.Diagnostics.Process
-    #$process.StartInfo = $processInfo
-    #$process.Start() | Out-Null
+    #$cmdline = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+    $processInfo.Arguments = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+   # Start-Process -FilePath "docker" -ArgumentList $cmdline
+    $processInfo.RedirectStandardOutput = $true
+    $processInfo.RedirectStandardError = $true
+    $processInfo.UseShellExecute = $true
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $processInfo
+    $process.Start() | Out-Null
 
     # Filter output: replace 'spicelabs.sh' with 'spice-labs-cli.sh' and remove help block
     $outputLines = @()
