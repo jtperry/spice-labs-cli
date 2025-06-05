@@ -162,9 +162,9 @@ try {
     Write-Host (@("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args)
     $processInfo.ArgumentList = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
     
-    $processInfo.RedirectStandardOutput = $true
-    $processInfo.RedirectStandardError = $true
-    $processInfo.UseShellExecute = $false
+    #$processInfo.RedirectStandardOutput = $true
+    #$processInfo.RedirectStandardError = $true
+    $processInfo.UseShellExecute = $true
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
     $process.Start() | Out-Null
