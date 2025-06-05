@@ -162,6 +162,7 @@ try {
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
+    Write-Host ("About to write argument list")
     Write-Host ($processInfo.ArgumentList)
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
