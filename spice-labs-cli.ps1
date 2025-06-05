@@ -160,6 +160,7 @@ try {
     $processInfo.FileName = "docker"
     Write-Host ("After filename")
     $processInfo.ArgumentList = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+    Write-Host ("After argument")
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
