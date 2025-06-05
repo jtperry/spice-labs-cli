@@ -160,8 +160,9 @@ try {
     #$processInfo = New-Object System.Diagnostics.ProcessStartInfo
     #$processInfo.FileName = "docker"
     Write-Host (@("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args)
+    $cmdline = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
     #$processInfo.ArgumentList = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
-    Start-Process -FilePath "docker" -ArgumentList @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
+    Start-Process -FilePath "docker" -ArgumentList $cmdline
     #$processInfo.RedirectStandardOutput = $true
     #$processInfo.RedirectStandardError = $true
     #$processInfo.UseShellExecute = $true
