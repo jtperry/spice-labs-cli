@@ -41,7 +41,6 @@ while ($i -lt $args.Count) {
     switch ($args[$i]) {
         '--command' {
             $command = $args[$i + 1]
-            Write-Host "Command is $command"
             $i += 2
             continue
         }
@@ -163,7 +162,7 @@ try {
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
-
+    Write-Host ($processInfo.ArgumentList)
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
     $process.Start() | Out-Null
