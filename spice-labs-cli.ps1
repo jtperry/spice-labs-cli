@@ -110,10 +110,32 @@ if ($command -eq "scan-artifacts" -or $command -eq "run") {
             New-Item -ItemType Directory -Path $outputPath | Out-Null
         }
     }
-   # if (-not (Test-Path $outputPath -PathType Container) -or -not (Get-Acl $outputPath).AccessToString.Contains("Write")) {
-   #     Write-Host "Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
-   #     exit 1
-   # }
+   if (-not (Test-Path $outputPath -PathType Container) 
+   {
+       $test_tmp_filename = "writetest-"+[guid]::NewGuid()
+	$test_filename = (Join-Path $test_folder $test_tmp_filename)
+	
+	Try { 
+		# Try to add a new file
+		[io.file]::OpenWrite($test_filename).close()
+		Write-Host -ForegroundColor Green "[+] Writable:" $test_folder
+		
+		# Remove test file
+		Remove-Item -ErrorAction SilentlyContinue $test_filename
+		
+		if (Test-Path $test_filename and $verbose) { 
+			Write-Host -ForegroundColor Yellow "[*] Failed to delete test file: " $test_filename
+		}
+	}
+	Catch {
+		# Report error?
+		if ($verbose) { 
+			Write-Host -ForegroundColor Red "[-] Not writable: " $test_folder
+		}
+        exit 1
+	}
+      
+   }
     $docker_args += @('--output', '/mnt/output')
 }
 
