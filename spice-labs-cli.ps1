@@ -159,15 +159,16 @@ if ($outputPath) { Write-Host "Mounting output: ($outputPath)" }
 try {
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
     $processInfo.FileName = "docker"
-    Write-Host (@("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args)
+    #Write-Host (@("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args)
     #$cmdline = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
     $processInfo.Arguments = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
    # Start-Process -FilePath "docker" -ArgumentList $cmdline
-    $processInfo.RedirectStandardOutput = $false
+    $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $processInfo
+    Write-Host("Starting CLI Process Please Stand By....")
     $process.Start() | Out-Null
 
     # Filter output: replace 'spicelabs.sh' with 'spice-labs-cli.sh' and remove help block
