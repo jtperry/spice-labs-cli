@@ -188,6 +188,7 @@ try {
         throw "Spice Labs CLI failed."
     }
 } catch {
+    Write-Host "Error: $($_.Exception.Message)"
     Write-Host "   "
     Write-Host "The Spice Labs CLI failed" 
     Show-Help
