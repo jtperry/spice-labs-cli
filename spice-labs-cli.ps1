@@ -163,7 +163,7 @@ try {
     #$cmdline = @("run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
     $processInfo.Arguments = @(" run") + $flags + $volumes + @($DOCKER_IMAGE) + $docker_args + $extra_args
    # Start-Process -FilePath "docker" -ArgumentList $cmdline
-    $processInfo.RedirectStandardOutput = $true
+    $processInfo.RedirectStandardOutput = $false
     $processInfo.RedirectStandardError = $true
     $processInfo.UseShellExecute = $false
     $process = New-Object System.Diagnostics.Process
