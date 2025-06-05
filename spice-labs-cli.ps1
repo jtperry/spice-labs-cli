@@ -110,10 +110,10 @@ if ($command -eq "scan-artifacts" -or $command -eq "run") {
             New-Item -ItemType Directory -Path $outputPath | Out-Null
         }
     }
-    if (-not (Test-Path $outputPath -PathType Container) -or -not (Get-Acl $outputPath).AccessToString.Contains("Write")) {
-        Write-Host "Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
-        exit 1
-    }
+   # if (-not (Test-Path $outputPath -PathType Container) -or -not (Get-Acl $outputPath).AccessToString.Contains("Write")) {
+   #     Write-Host "Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
+   #     exit 1
+   # }
     $docker_args += @('--output', '/mnt/output')
 }
 
