@@ -135,6 +135,7 @@ if ($command -eq "scan-artifacts" -or $command -eq "run") {
 	}
       
    }
+    $outputPath = Convert-Path $outputPath
     $docker_args += @('--output', '/mnt/output')
 }
 
