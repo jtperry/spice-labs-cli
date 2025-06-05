@@ -41,6 +41,7 @@ while ($i -lt $args.Count) {
     switch ($args[$i]) {
         '--command' {
             $command = $args[$i + 1]
+            Write-Host "Command is $command"
             $i += 2
             continue
         }
@@ -110,7 +111,7 @@ if ($command -eq "scan-artifacts" -or $command -eq "run") {
         }
     }
     if (-not (Test-Path $outputPath -PathType Container) -or -not (Get-Acl $outputPath).AccessToString.Contains("Write")) {
-        Write-Host "❌ Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
+        Write-Host "Output directory '$outputPath' is not writable. Please fix permissions and try again." -ForegroundColor Red
         exit 1
     }
     $docker_args += @('--output', '/mnt/output')
